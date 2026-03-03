@@ -43,8 +43,8 @@ const Hero = () => {
                 </motion.h1>
 
                 <motion.div variants={itemVariants} className="mb-10 max-w-2xl mx-auto">
-                    <p className="text-2xl md:text-3xl text-text-secondary font-mono terminal-text">
-                        Compete. Learn. Dominate.
+                    <p className="text-2xl md:text-3xl text-text-secondary font-mono terminal-text uppercase tracking-widest">
+                        CODING. DSA. CONTEST.
                     </p>
                 </motion.div>
 

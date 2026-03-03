@@ -24,7 +24,7 @@ const Navigation = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center backdrop-blur-md border-b border-white/5 bg-background/50">
       <Link to="/" className="flex items-center gap-2 relative z-[60]">
-        <div className="w-8 h-8 bg-accent rounded-sm flex items-center justify-center font-black text-background text-xl">L</div>
+        <img src="/leetverse logo.jpg" alt="LeetVerse Logo" className="w-10 h-10 object-contain rounded-sm" />
         <span className="font-display font-bold text-xl tracking-tighter">LEET<span className="text-accent underline decoration-accent/30 underline-offset-4">VERSE</span></span>
       </Link>
 
