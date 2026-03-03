@@ -105,7 +105,7 @@ const Leaderboard = () => {
                     className="space-y-4"
                 >
                     {/* Header */}
-                    <div className="hidden md:flex px-8 py-2 text-white/40 text-[10px] font-mono uppercase tracking-[0.2em] font-bold">
+                    <div className="hidden sm:flex px-8 py-2 text-white/40 text-[10px] font-mono uppercase tracking-[0.2em] font-bold">
                         <span className="w-20">Rank</span>
                         <span className="flex-1 px-4">Participant Detail</span>
                         <span className="w-32 text-right">Commit Pts</span>
@@ -143,7 +143,7 @@ const Leaderboard = () => {
 
                                 {/* Student Info */}
                                 <div className="flex-1 px-4 overflow-hidden">
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
                                         <div className="flex items-center gap-3">
                                             <h3 className="text-xl font-black tracking-tighter transition-all duration-300 font-mono truncate text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.05)] uppercase">
                                                 {item.rollNo}
@@ -155,12 +155,12 @@ const Leaderboard = () => {
                                             )}
                                         </div>
                                         {item.name && (
-                                            <p className="text-sm text-accent/90 font-black font-mono mt-0.5 group-hover:translate-x-1 transition-transform duration-300 tracking-tight brightness-125">
+                                            <p className="text-sm text-accent/90 font-black font-mono group-hover:translate-x-1 transition-transform duration-300 tracking-tight brightness-125 whitespace-nowrap">
                                                 {item.name}
                                             </p>
                                         )}
                                         {item.remarks && (
-                                            <p className="text-[10px] text-white/50 font-mono mt-1 font-medium italic opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                                            <p className="text-[10px] text-white/50 font-mono font-medium italic opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300 hidden sm:block">
                                                 {item.remarks}
                                             </p>
                                         )}

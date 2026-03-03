@@ -99,10 +99,11 @@ const Dashboard = () => {
                 } else if (user?.rollNo) {
                     // Participant view
                     const [profileRes, historyRes] = await Promise.all([
-                        getMyProfile(),
+                        getUserProfile(),
                         getUserHistory(user.rollNo)
                     ]);
-                    setProfile(profileRes.data);
+                    // getUserProfile returns { role, requesting_user, data:FirestoreDoc }
+                    setProfile(profileRes.data.data || profileRes.data);
                     setHistory(historyRes.data.history || []);
                 }
             } catch (error) {
@@ -274,14 +275,14 @@ const Dashboard = () => {
     return (
         <div className="pt-24 pb-12 px-6 max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div className="md:col-span-2 glass-panel p-10 relative overflow-hidden group border-white/5">
+                <div className="md:col-span-2 glass-panel p-6 sm:p-10 relative overflow-hidden group border-white/5">
                     <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
                         <User size={160} />
                     </div>
                     <div className="relative z-10">
-                        <div className="flex items-center gap-6 mb-10">
-                            <div className="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center border border-accent/20 ring-4 ring-accent/5">
-                                <span className="text-3xl font-black text-accent">{user?.name?.charAt(0)}</span>
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-8 sm:mb-10 text-center sm:text-left">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-accent/10 rounded-full flex items-center justify-center border border-accent/20 ring-4 ring-accent/5">
+                                <span className="text-2xl sm:text-3xl font-black text-accent">{user?.name?.charAt(0)}</span>
                             </div>
                             <div>
                                 <h1 className="text-4xl font-display font-bold tracking-tighter text-white">{user?.name}</h1>
@@ -309,7 +310,7 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <div className="glass-panel p-10 flex flex-col items-center justify-center text-center border-white/5 relative group cursor-default">
+                <div className="glass-panel p-6 sm:p-10 flex flex-col items-center justify-center text-center border-white/5 relative group cursor-default">
                     <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <Award className="text-accent mb-6 animate-pulse" size={56} />
                     <h3 className="font-display font-bold text-xl mb-2 text-white tracking-tight">ACHIEVEMENTS</h3>

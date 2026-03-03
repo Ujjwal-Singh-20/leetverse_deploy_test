@@ -8,21 +8,31 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
 import AdminUpload from './pages/AdminUpload';
 import Unauthorized from './pages/Unauthorized';
-import { LogIn, LogOut, User as UserIcon, Shield } from 'lucide-react';
+import { LogIn, LogOut, User as UserIcon, Shield, X } from 'lucide-react';
 
 const Navigation = () => {
   const { user, login, logout, isAdmin } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Leaderboard', path: '/#leaderboard' },
+  ];
+
+  const handleLinkClick = () => setIsMenuOpen(false);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex justify-between items-center backdrop-blur-md border-b border-white/5 bg-background/50">
-      <Link to="/" className="flex items-center gap-2">
+      <Link to="/" className="flex items-center gap-2 relative z-[60]">
         <div className="w-8 h-8 bg-accent rounded-sm flex items-center justify-center font-black text-background text-xl">L</div>
         <span className="font-display font-bold text-xl tracking-tighter">LEET<span className="text-accent underline decoration-accent/30 underline-offset-4">VERSE</span></span>
       </Link>
 
+      {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-widest">
-        <Link to="/" className="hover:text-accent transition-colors">Home</Link>
-        <a href="/#leaderboard" className="hover:text-accent transition-colors">Leaderboard</a>
+        {navLinks.map(link => (
+          <Link key={link.name} to={link.path} className="hover:text-accent transition-colors">{link.name}</Link>
+        ))}
 
         {user ? (
           <div className="flex items-center gap-6">
@@ -49,6 +59,57 @@ const Navigation = () => {
             <LogIn size={14} className="group-hover:translate-x-1 transition-transform" /> REGISTER / LOGIN
           </button>
         )}
+      </div>
+
+      {/* Mobile Menu Toggle */}
+      <button
+        className="md:hidden relative z-[60] p-2 text-accent"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        {isMenuOpen ? <X size={24} /> : <div className="space-y-1.5 w-6">
+          <div className="h-0.5 bg-accent w-full" />
+          <div className="h-0.5 bg-accent w-full" />
+          <div className="h-0.5 bg-accent w-full" />
+        </div>}
+      </button>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`fixed inset-0 bg-background z-[55] transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} md:hidden flex flex-col items-center justify-center p-8 space-y-12`}>
+        <div className="flex flex-col items-center gap-8 text-xl font-mono uppercase tracking-[0.3em]">
+          {navLinks.map(link => (
+            <Link key={link.name} to={link.path} onClick={handleLinkClick} className="hover:text-accent transition-colors">{link.name}</Link>
+          ))}
+        </div>
+
+        <div className="h-[1px] w-12 bg-white/10" />
+
+        <div className="flex flex-col items-center gap-8">
+          {user ? (
+            <>
+              {isAdmin && (
+                <Link to="/admin" onClick={handleLinkClick} className="flex items-center gap-2 text-accent font-mono text-sm tracking-widest">
+                  <Shield size={18} /> ADMIN_PORTAL
+                </Link>
+              )}
+              <Link to="/profile" onClick={handleLinkClick} className="flex items-center gap-2 text-white font-mono text-sm tracking-widest">
+                <UserIcon size={18} /> {user.rollNo}
+              </Link>
+              <button
+                onClick={() => { logout(); handleLinkClick(); }}
+                className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-widest"
+              >
+                <LogOut size={16} /> LOGOUT
+              </button>
+            </>
+          ) : (
+            <button
+              className="px-8 py-3 border border-accent text-accent font-mono text-sm tracking-widest"
+              onClick={() => { login(); handleLinkClick(); }}
+            >
+              REGISTER / LOGIN
+            </button>
+          )}
+        </div>
       </div>
     </nav>
   );
