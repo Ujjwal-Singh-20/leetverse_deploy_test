@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Dashboard from './pages/Dashboard';
 import AdminUpload from './pages/AdminUpload';
 import Unauthorized from './pages/Unauthorized';
+import ParallaxBackground from './components/ParallaxBackground';
 import { LogIn, LogOut, User as UserIcon, Shield, X } from 'lucide-react';
 
 const Navigation = () => {
@@ -144,6 +145,7 @@ function AppContent() {
       <div className="fixed inset-0 bg-gradient-to-tr from-background via-transparent to-accent/10 pointer-events-none" />
       <div className="fixed top-0 right-0 w-[50vw] h-full bg-gradient-to-l from-accent/20 to-transparent pointer-events-none z-0 blur-[120px] opacity-60" />
 
+      <ParallaxBackground />
       <Particles />
 
       {/* Background terminal scan-line effect - Moved behind content */}
