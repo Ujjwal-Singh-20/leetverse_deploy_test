@@ -1,9 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getUserHistory, getUserProfile, getMyProfile } from '../services/api';
+import { getUserHistory, getUserProfile, getMyProfile, getOverallLeaderboard } from '../services/api';
 import { Trophy, Calendar, Award, User, Users, Eye, X, Shield, ChevronRight } from 'lucide-react';
 
 const UserDetailModal = ({ user, onClose }) => {
+    const [rank, setRank] = useState('--');
+    const [loadingRank, setLoadingRank] = useState(false);
+    const [history, setHistory] = useState([]);
+    const [attendancePercent, setAttendancePercent] = useState(null);
+    const [loadingHistory, setLoadingHistory] = useState(false);
+
+    useEffect(() => {
+        const fetchRank = async () => {
+            if (!user) return;
+            setLoadingRank(true);
+            try {
+                const response = await getOverallLeaderboard();
+                const leaderboard = response.data;
+                const userIndex = leaderboard.findIndex(s => s.rollNo === user.rollNo);
+                if (userIndex !== -1) {
+                    setRank((userIndex + 1).toString().padStart(2, '0'));
+                } else {
+                    setRank('NR'); // Not Ranked
+                }
+            } catch (error) {
+                console.error('Error fetching rank for modal:', error);
+                setRank('ERR');
+            } finally {
+                setLoadingRank(false);
+            }
+        };
+
+        const fetchHistory = async () => {
+            if (!user) return;
+            setLoadingHistory(true);
+            try {
+                const response = await getUserHistory(user.rollNo);
+                const historyData = response.data.history || [];
+                setHistory(historyData);
+
+                // Calculate percentage from history if backend value seems incorrect or as a fallback
+                if (historyData.length > 0) {
+                    const presentDays = historyData.filter(h => h.status === 'present').length;
+                    const calculatedPercent = Math.round((presentDays / historyData.length) * 100);
+                    setAttendancePercent(calculatedPercent);
+                } else {
+                    setAttendancePercent(response.data.attendancePercentage || 0);
+                }
+            } catch (error) {
+                console.error('Error fetching history for modal:', error);
+            } finally {
+                setLoadingHistory(false);
+            }
+        };
+
+        fetchRank();
+        fetchHistory();
+    }, [user]);
+
     if (!user) return null;
 
     return (
@@ -39,7 +93,11 @@ const UserDetailModal = ({ user, onClose }) => {
                             </div>
                             <div className="bg-white/5 p-6 rounded-sm border border-white/10">
                                 <span className="text-[10px] font-mono text-white/70 uppercase block mb-1 tracking-widest font-bold">Global Rank</span>
-                                <span className="text-3xl font-black text-white">--</span>
+                                <span className={`text-3xl font-black ${rank !== '--' && rank !== 'NR' && rank !== 'ERR' ? 'text-accent' : 'text-white'}`}>
+                                    {loadingRank ? (
+                                        <span className="inline-block w-8 h-8 border-2 border-accent/20 border-t-accent rounded-full animate-spin align-middle" />
+                                    ) : rank}
+                                </span>
                             </div>
                         </div>
 
@@ -56,9 +114,54 @@ const UserDetailModal = ({ user, onClose }) => {
                                     <span className="text-2xl font-black text-accent">{user.attendanceSummary?.daysPresent || 0}</span>
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-xs font-mono text-white/70 mb-1 italic font-bold">Days Absent</span>
-                                    <span className="text-2xl font-black text-red-500">{user.attendanceSummary?.daysAbsent || 0}</span>
+                                    <span className="text-xs font-mono text-white/70 mb-1 italic font-bold">Attendance Rate</span>
+                                    <span className="text-2xl font-black text-white">
+                                        {attendancePercent !== null ? `${attendancePercent}%` : '--'}
+                                    </span>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white/5 p-6 rounded-sm border border-white/5">
+                            <span className="text-[10px] font-mono text-white/40 uppercase block mb-3 tracking-widest">Score History</span>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left font-mono text-[11px]">
+                                    <thead className="border-b border-white/5 bg-black/20">
+                                        <tr>
+                                            <th className="px-4 py-3 text-white/40 uppercase tracking-widest">Date</th>
+                                            <th className="px-4 py-3 text-white/40 uppercase tracking-widest">Points</th>
+                                            <th className="px-4 py-3 text-white/40 uppercase tracking-widest">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {loadingHistory ? (
+                                            <tr>
+                                                <td colSpan="3" className="px-4 py-8 text-center">
+                                                    <div className="inline-block w-6 h-6 border-2 border-accent/20 border-t-accent rounded-full animate-spin" />
+                                                </td>
+                                            </tr>
+                                        ) : history.length > 0 ? (
+                                            history.map((entry, idx) => (
+                                                <tr key={idx} className="hover:bg-white/5 transition-colors">
+                                                    <td className="px-4 py-3 text-white">{entry.date}</td>
+                                                    <td className="px-4 py-3 text-accent">+{entry.points}</td>
+                                                    <td className="px-4 py-3">
+                                                        <span className={`px-1.5 py-0.5 rounded-sm border uppercase text-[9px] font-bold ${entry.status === 'present'
+                                                            ? 'text-accent border-accent/20 bg-accent/5'
+                                                            : 'text-red-400 border-red-500/20 bg-red-500/5'
+                                                            }`}>
+                                                            {entry.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="3" className="px-4 py-8 text-center text-white/20 italic">No history found</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 

@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.env
+leetversetest-firebase-adminsdk-fbsvc-7545cf3a68.json
+package-lock.json
