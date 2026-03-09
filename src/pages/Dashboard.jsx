@@ -78,7 +78,7 @@ const UserDetailModal = ({ user, onClose }) => {
 };
 
 const Dashboard = () => {
-    const { user, isAdmin } = useAuth();
+    const { user, isAdmin, loading: authLoading } = useAuth();
     const [profile, setProfile] = useState(null);
     const [allUsers, setAllUsers] = useState([]);
     const [allAdmins, setAllAdmins] = useState([]);
@@ -113,10 +113,12 @@ const Dashboard = () => {
             }
         };
 
-        fetchData();
-    }, [user, isAdmin]);
+        if (!authLoading) {
+            fetchData();
+        }
+    }, [user, isAdmin, authLoading]);
 
-    if (loading) return (
+    if (loading || authLoading) return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-background">
             <div className="w-16 h-1 w-32 bg-accent/20 relative overflow-hidden mb-4">
                 <div className="absolute top-0 left-0 h-full bg-accent animate-progress w-full" />

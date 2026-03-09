@@ -2,43 +2,108 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { Users, Crown, Star, Instagram, Linkedin, Github, Loader2, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
-const MemberCard = ({ person, index }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="p-8 bg-white/5 border border-white/10 rounded-2xl hover:border-accent/30 transition-all group/card flex flex-col items-center text-center"
-    >
-        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-accent/20 group-hover/card:border-accent transition-all mb-6 relative">
-            <img
-                src={person.photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder"}
-                alt={person.name}
-                className="w-full h-full object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500"
+const MemberCard = ({ person, index }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseXSpring = useSpring(x);
+    const mouseYSpring = useSpring(y);
+
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+    // Subtle image movement for depth
+    const imgX = useTransform(mouseXSpring, [-0.5, 0.5], ["-5px", "5px"]);
+    const imgY = useTransform(mouseYSpring, [-0.5, 0.5], ["-5px", "5px"]);
+
+    const handleMouseMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{
+                rotateX,
+                rotateY,
+                transformStyle: "preserve-3d",
+            }}
+            className="p-8 bg-white/5 border border-white/10 rounded-2xl hover:border-accent/30 transition-all group/card flex flex-col items-center text-center relative overflow-hidden"
+        >
+            <motion.div
+                style={{
+                    x: imgX,
+                    y: imgY,
+                    transformZ: "50px"
+                }}
+                className="w-27 h-27 rounded-full overflow-hidden border-2 border-accent/20 group-hover/card:border-accent transition-all mb-6 relative z-10"
+            >
+                <img
+                    src={person.photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder"}
+                    alt={person.name}
+                    className="w-full h-full object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500"
+                />
+            </motion.div>
+
+            <motion.h4
+                style={{ transformZ: "30px" }}
+                className="text-xl font-display font-bold text-white mb-2 tracking-tight z-10"
+            >
+                {person.name}
+            </motion.h4>
+
+            <motion.div
+                style={{ transformZ: "20px" }}
+                className="flex items-center gap-4 mt-4 z-10"
+            >
+                {person.instagram && (
+                    <a href={person.instagram} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-accent transition-colors">
+                        <Instagram size={18} />
+                    </a>
+                )}
+                {person.linkedin && (
+                    <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-accent transition-colors">
+                        <Linkedin size={18} />
+                    </a>
+                )}
+                {person.github && (
+                    <a href={person.github} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-accent transition-colors">
+                        <Github size={18} />
+                    </a>
+                )}
+            </motion.div>
+
+            {/* Background Glow that follows mouse */}
+            <motion.div
+                className="absolute inset-0 bg-accent/5 opacity-0 group-hover/card:opacity-100 transition-opacity"
+                style={{
+                    background: `radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 255, 157, 0.1) 0%, transparent 80%)`,
+                }}
             />
-        </div>
-        <h4 className="text-xl font-display font-bold text-white mb-2 tracking-tight">{person.name}</h4>
-
-        <div className="flex items-center gap-4 mt-4">
-            {person.instagram && (
-                <a href={person.instagram} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-accent transition-colors">
-                    <Instagram size={18} />
-                </a>
-            )}
-            {person.linkedin && (
-                <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-accent transition-colors">
-                    <Linkedin size={18} />
-                </a>
-            )}
-            {person.github && (
-                <a href={person.github} target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-accent transition-colors">
-                    <Github size={18} />
-                </a>
-            )}
-        </div>
-    </motion.div>
-);
+        </motion.div>
+    );
+};
 
 const Members = () => {
     const [members, setMembers] = useState({ president: [], 'vice-president': [] });
@@ -48,7 +113,7 @@ const Members = () => {
     useEffect(() => {
         const fetchMembers = async () => {
             try {
-                console.log("Fetching members from Firestore...");
+                // console.log("Fetching members from Firestore...");
                 const roles = ['president', 'vice-president'];
                 const fetchedData = {};
 
@@ -56,7 +121,7 @@ const Members = () => {
                     const personsRef = collection(db, 'members', role, 'persons');
                     const snapshot = await getDocs(personsRef);
                     fetchedData[role] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    console.log(`Fetched ${fetchedData[role].length} persons for ${role}`);
+                    // console.log(`Fetched ${fetchedData[role].length} persons for ${role}`);
                 }
 
                 setMembers(fetchedData);
