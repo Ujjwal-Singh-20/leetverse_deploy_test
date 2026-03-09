@@ -62,7 +62,7 @@ const MemberCard = ({ person, index }) => {
                 <img
                     src={person.photoUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=placeholder"}
                     alt={person.name}
-                    className="w-full h-full object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500"
+                    className="w-full h-full object-cover transition-all duration-500"
                 />
             </motion.div>
 
@@ -258,6 +258,7 @@ const Members = () => {
                             ))}
                         </div>
                     </div>
+
 
                     <div className="absolute inset-0 z-30 flex flex-col items-center justify-center">
                         <motion.div
