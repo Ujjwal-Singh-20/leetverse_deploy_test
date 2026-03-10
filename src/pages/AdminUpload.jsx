@@ -1,6 +1,149 @@
 import React, { useState, useEffect } from 'react';
 import { uploadExcel, getUploadStatus } from '../services/api';
-import { Upload, FileSpreadsheet, CheckCircle, XCircle, Loader2, RefreshCw } from 'lucide-react';
+import { Upload, FileSpreadsheet, CheckCircle, XCircle, Loader2, RefreshCw, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const DatePicker = ({ selectedDate, onChange }) => {
+    const [viewDate, setViewDate] = useState(new Date(selectedDate));
+    const [showPicker, setShowPicker] = useState(false);
+
+    const daysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+    const firstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+    const formatDate = (date) => {
+        // Set to noon to avoid timezone shifts when converting to ISO date string
+        const d = new Date(date);
+        d.setHours(12, 0, 0, 0);
+        return d.toISOString().split('T')[0];
+    };
+
+    const handlePrevMonth = () => {
+        setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
+    };
+
+    const handleNextMonth = () => {
+        setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
+    };
+
+    const handleDateSelect = (day) => {
+        const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day, 12, 0, 0);
+        onChange(formatDate(newDate));
+        setShowPicker(false);
+    };
+
+    const isToday = (day) => {
+        const today = new Date();
+        return (
+            day === today.getDate() &&
+            viewDate.getMonth() === today.getMonth() &&
+            viewDate.getFullYear() === today.getFullYear()
+        );
+    };
+
+    const isSelected = (day) => {
+        const current = new Date(selectedDate);
+        return (
+            day === current.getDate() &&
+            viewDate.getMonth() === current.getMonth() &&
+            viewDate.getFullYear() === current.getFullYear()
+        );
+    };
+
+    const days = [];
+    const totalDays = daysInMonth(viewDate.getFullYear(), viewDate.getMonth());
+    const firstDay = firstDayOfMonth(viewDate.getFullYear(), viewDate.getMonth());
+
+    for (let i = 0; i < firstDay; i++) {
+        days.push(<div key={`empty-${i}`} className="h-10 w-10" />);
+    }
+
+    for (let d = 1; d <= totalDays; d++) {
+        days.push(
+            <button
+                key={d}
+                onClick={() => handleDateSelect(d)}
+                className={`h-10 w-10 rounded-sm flex items-center justify-center text-sm font-mono transition-all ${isSelected(d)
+                    ? 'bg-accent text-background font-bold'
+                    : isToday(d)
+                        ? 'border border-accent/40 text-accent'
+                        : 'hover:bg-white/10 text-white/80'
+                    }`}
+            >
+                {d}
+            </button>
+        );
+    }
+
+    const monthNames = [
+        "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+        "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+    ];
+
+    return (
+        <div className="relative">
+            <button
+                onClick={() => setShowPicker(!showPicker)}
+                className="flex items-center gap-3 px-6 py-3 bg-white/5 border border-white/10 hover:border-accent/40 rounded-sm transition-all group"
+            >
+                <CalendarIcon size={18} className="text-accent group-hover:scale-110 transition-transform" />
+                <span className="text-white font-mono text-sm tracking-widest">{selectedDate}</span>
+            </button>
+
+            <AnimatePresence>
+                {showPicker && (
+                    <>
+                        <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setShowPicker(false)}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            className="absolute mt-4 left-0 z-50 glass-panel p-6 border border-white/10 shadow-2xl min-w-[320px]"
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <button onClick={handlePrevMonth} className="p-1 hover:text-accent transition-colors">
+                                    <ChevronLeft size={20} />
+                                </button>
+                                <div className="text-center">
+                                    <div className="text-xs font-mono text-white/40 tracking-[0.2em]">{viewDate.getFullYear()}</div>
+                                    <div className="text-sm font-display font-black text-white tracking-widest uppercase">
+                                        {monthNames[viewDate.getMonth()]}
+                                    </div>
+                                </div>
+                                <button onClick={handleNextMonth} className="p-1 hover:text-accent transition-colors">
+                                    <ChevronRight size={20} />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-7 gap-1 mb-2">
+                                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                                    <div key={i} className="h-10 w-10 flex items-center justify-center text-[10px] font-mono text-white/30">
+                                        {d}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="grid grid-cols-7 gap-1">
+                                {days}
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    onChange(formatDate(new Date()));
+                                    setShowPicker(false);
+                                }}
+                                className="mt-6 w-full py-2 border border-white/5 hover:bg-white/5 text-[10px] font-mono text-white/40 hover:text-white transition-all uppercase tracking-widest"
+                            >
+                                Jump to Today
+                            </button>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const AdminUpload = () => {
     const [file, setFile] = useState(null);
@@ -9,15 +152,16 @@ const AdminUpload = () => {
     const [message, setMessage] = useState('');
     const [alreadyUploaded, setAlreadyUploaded] = useState(false);
     const [forceUpload, setForceUpload] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         checkStatus();
-    }, []);
+    }, [selectedDate]);
 
     const checkStatus = async () => {
         try {
-            const today = new Date().toISOString().split('T')[0];
-            const response = await getUploadStatus(today);
+            setAlreadyUploaded(false); // Reset while checking
+            const response = await getUploadStatus(selectedDate);
             if (response.data.uploaded) {
                 setAlreadyUploaded(true);
             }
@@ -41,11 +185,11 @@ const AdminUpload = () => {
         formData.append('file', file);
 
         try {
-            const response = await uploadExcel(formData);
+            const response = await uploadExcel(formData, selectedDate);
             setStatus('success');
             setAlreadyUploaded(true);
             setForceUpload(false);
-            setMessage(`Successfully processed ${response.data.total_processed} entries. Updated ${response.data.updated_count} users.`);
+            setMessage(`Successfully processed ${response.data.total_processed} entries for ${selectedDate}. Updated ${response.data.updated_count} users.`);
             setFile(null);
         } catch (error) {
             console.error('Upload failed:', error);
@@ -67,18 +211,41 @@ const AdminUpload = () => {
                 </p>
             </div>
 
+            <div className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 glass-panel p-8 border border-white/5">
+                <div>
+                    <h3 className="text-xs font-mono text-white/40 uppercase tracking-[0.2em] mb-2">Target Synchronization Date</h3>
+                    <p className="text-sm text-white/60 mb-4 font-body">Select the date corresponding to the metrics in your Excel file.</p>
+                    <DatePicker selectedDate={selectedDate} onChange={setSelectedDate} />
+                </div>
+
+                <div className="flex flex-col items-end">
+                    <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest mb-2">Live Status</div>
+                    {alreadyUploaded ? (
+                        <div className="flex items-center gap-2 px-4 py-2 bg-accent/10 border border-accent/20 rounded-full">
+                            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                            <span className="text-[10px] font-mono font-bold text-accent uppercase tracking-tighter">Synchronized_{selectedDate}</span>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+                            <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                            <span className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-tighter">Awaiting_Data_{selectedDate}</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             <div className="glass-panel p-12 border-dashed border-2 border-white/10 hover:border-accent/40 transition-all text-center relative overflow-hidden group">
                 {alreadyUploaded && !forceUpload ? (
                     <div className="relative z-10 flex flex-col items-center py-8">
                         <div className="w-24 h-24 bg-accent/10 rounded-full flex items-center justify-center mb-6 ring-4 ring-accent/5">
                             <CheckCircle className="text-accent" size={48} />
                         </div>
-                        <h2 className="text-2xl font-display font-bold text-white mb-2">SYSTEM_SYNCHRONIZED</h2>
-                        <p className="text-white/60 font-mono text-sm mb-10">Today's metrics have already been processed and committed to the database.</p>
+                        <h2 className="text-2xl font-display font-bold text-white mb-2 uppercase tracking-tight">DATA_COMMITTED_{selectedDate.replace(/-/g, '_')}</h2>
+                        <p className="text-white/60 font-mono text-sm mb-10">Metrics for this period have already been processed and finalized.</p>
 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="px-6 py-3 bg-accent/10 border border-accent/20 rounded-sm">
-                                <span className="text-accent font-mono text-xs font-bold tracking-widest uppercase text-white">READY_FOR_NEXT_SESSION</span>
+                                <span className="text-accent font-mono text-xs font-bold tracking-widest uppercase">READY_FOR_NEXT_SESSION</span>
                             </div>
                             <button
                                 onClick={() => setForceUpload(true)}
@@ -127,6 +294,7 @@ const AdminUpload = () => {
 
                         {forceUpload && (
                             <button
+                                type="button"
                                 onClick={() => setForceUpload(false)}
                                 className="mt-4 text-[10px] font-mono text-white/40 hover:text-white uppercase tracking-widest transition-colors underline underline-offset-4"
                             >

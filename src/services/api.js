@@ -23,7 +23,8 @@ export const getUserProfile = () => api.get('/profile');
 export const getOverallLeaderboard = () => api.get('/leaderboard/overall');
 export const getDailyLeaderboard = (date) => api.get(`/leaderboard/${date}`);
 export const getUserHistory = (rollNo) => api.get(`/user/${rollNo}/history`);
-export const uploadExcel = (formData) => api.post('/upload-excel', formData, {
+export const uploadExcel = (formData, date) => api.post('/upload-excel', formData, {
+    params: { score_date: date },
     headers: {
         'Content-Type': 'multipart/form-data',
     },
