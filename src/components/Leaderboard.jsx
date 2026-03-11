@@ -155,7 +155,7 @@ const Leaderboard = () => {
                                             )}
                                         </div>
                                         {item.name && (
-                                            <p className="text-sm text-accent/90 font-black font-mono group-hover:translate-x-1 transition-transform duration-300 tracking-tight brightness-125 truncate max-w-[120px] sm:max-w-none">
+                                            <p className="text-sm text-accent/90 font-black font-mono group-hover:translate-x-1 transition-transform duration-300 tracking-tight brightness-125 truncate max-w-[150px] sm:max-w-none">
                                                 {item.name}
                                             </p>
                                         )}

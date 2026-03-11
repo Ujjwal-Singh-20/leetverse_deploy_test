@@ -205,7 +205,7 @@ function AppContent() {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-background selection:bg-accent selection:text-background text-white">
+    <div className="min-h-screen bg-background selection:bg-accent selection:text-background text-white overflow-x-hidden w-full relative">
       {/* Visual background layers */}
       <div className="fixed inset-0 cyber-grid pointer-events-none opacity-[0.15]" />
       <div className="fixed inset-0 bg-gradient-to-tr from-background via-transparent to-accent/5 pointer-events-none" />
@@ -221,7 +221,7 @@ function AppContent() {
 
       <Navigation />
 
-      <main className="relative z-10">
+      <main className="relative z-10 w-full overflow-x-hidden">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/profile" element={<Dashboard />} />
