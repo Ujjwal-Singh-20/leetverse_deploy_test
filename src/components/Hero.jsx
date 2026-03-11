@@ -16,37 +16,37 @@ const ELabsModal = ({ onClose }) => (
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.93, y: 20 }}
                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="relative w-full max-w-2xl bg-[#0a0a0a] border border-[#f97316]/30 shadow-[0_0_60px_rgba(249,115,22,0.15)] overflow-hidden"
+                className="relative w-full max-w-2xl bg-[#0a0a0a] border border-accent/30 shadow-[0_0_60px_rgba(0,255,157,0.15)] overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
-                {/* Orange top bar */}
-                <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#f97316] to-transparent" />
+                {/* Green top bar */}
+                <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-accent to-transparent" />
 
                 {/* Corner accents */}
-                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#f97316]/60" />
-                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#f97316]/60" />
-                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#f97316]/60" />
-                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#f97316]/60" />
+                <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-accent/60" />
+                <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-accent/60" />
+                <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-accent/60" />
+                <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-accent/60" />
 
                 {/* Glow blob */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-[#f97316]/8 blur-[60px] pointer-events-none" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-accent/8 blur-[60px] pointer-events-none" />
 
                 <div className="p-8 md:p-10">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-8">
                         <div>
                             <div className="flex items-center gap-2 mb-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#f97316] animate-pulse" />
-                                <span className="text-[10px] font-mono text-[#f97316]/70 uppercase tracking-[0.3em] font-bold">Community Platform</span>
+                                <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                                <span className="text-[10px] font-mono text-accent/70 uppercase tracking-[0.3em] font-bold">Community Platform</span>
                             </div>
                             <h2 className="text-4xl font-black tracking-tighter text-white">
-                                E<span className="text-[#f97316]">Labs</span>
+                                E<span className="text-accent">Labs</span>
                             </h2>
-                            <div className="mt-1 h-[1px] w-16 bg-gradient-to-r from-[#f97316]/60 to-transparent" />
+                            <div className="mt-1 h-[1px] w-16 bg-gradient-to-r from-accent/60 to-transparent" />
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 text-white/30 hover:text-[#f97316] hover:bg-[#f97316]/10 rounded-sm transition-all border border-transparent hover:border-[#f97316]/20"
+                            className="p-2 text-white/30 hover:text-accent hover:bg-accent/10 rounded-sm transition-all border border-transparent hover:border-accent/20"
                         >
                             <X size={18} />
                         </button>
@@ -54,7 +54,7 @@ const ELabsModal = ({ onClose }) => (
 
                     {/* Divider */}
                     <div className="flex items-center gap-3 mb-6">
-                        <Zap size={14} className="text-[#f97316] shrink-0" />
+                        <Zap size={14} className="text-accent shrink-0" />
                         <div className="h-[1px] flex-1 bg-white/5" />
                     </div>
 
@@ -71,8 +71,8 @@ const ELabsModal = ({ onClose }) => (
 
                     {/* Footer */}
                     <div className="mt-8 pt-6 border-t border-white/5 flex items-center gap-4">
-                        <div className="flex-1 h-[1px] bg-gradient-to-r from-[#f97316]/20 to-transparent" />
-                        <span className="text-[10px] font-mono text-[#f97316]/40 uppercase tracking-[0.3em]">KIIT University</span>
+                        <div className="flex-1 h-[1px] bg-gradient-to-r from-accent/20 to-transparent" />
+                        <span className="text-[10px] font-mono text-accent/40 uppercase tracking-[0.3em]">KIIT University</span>
                     </div>
                 </div>
             </motion.div>
@@ -143,9 +143,9 @@ const Hero = () => {
 
                         <button
                             onClick={() => setShowModal(true)}
-                            className="group px-8 py-4 border border-[#f97316]/40 text-white font-bold text-lg hover:border-[#f97316] hover:text-[#f97316] hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-all duration-300"
+                            className="group px-8 py-4 border border-accent/40 text-white font-bold text-lg hover:border-accent hover:text-accent hover:shadow-[0_0_20px_rgba(0,255,157,0.2)] transition-all duration-300"
                         >
-                            ABOUT E<span className="text-[#f97316]">LABS</span>
+                            ABOUT E<span className="text-accent">LABS</span>
                         </button>
                     </motion.div>
                 </motion.div>
