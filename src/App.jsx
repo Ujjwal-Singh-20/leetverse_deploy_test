@@ -34,20 +34,19 @@ const SystemStatus = () => {
   }, []);
 
   if (isHealthy === true) return (
-    <div className="flex items-center gap-2 group cursor-help transition-all duration-500" title="Neural Link Active">
+    <div className="flex items-center gap-2 group cursor-help transition-all duration-500" title="Backend Active">
       <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_#00ff9d]" />
       <span className="text-[10px] font-mono text-accent/50 group-hover:text-accent transition-colors uppercase tracking-[0.2em] lg:block hidden">System_Live</span>
     </div>
   );
 
   return (
-    <div 
+    <div
       onClick={performCheck}
-      className={`flex items-center gap-3 px-3 py-1.5 border rounded-sm transition-all duration-500 cursor-pointer ${
-      isHealthy === false 
-        ? 'border-orange-500/30 bg-orange-500/5 text-orange-400' 
-        : 'border-white/10 text-white/40'
-    }`}>
+      className={`flex items-center gap-3 px-3 py-1.5 border rounded-sm transition-all duration-500 cursor-pointer ${isHealthy === false
+          ? 'border-orange-500/30 bg-orange-500/5 text-orange-400'
+          : 'border-white/10 text-white/40'
+        }`}>
       <div className={`w-1.5 h-1.5 rounded-full ${isHealthy === false ? 'bg-orange-500 animate-pulse shadow-[0_0_8px_#f97316]' : 'bg-white/20'}`} />
       <span className="text-[10px] font-mono uppercase tracking-[0.15em] font-bold">
         {isHealthy === false ? 'System_Waking_Up...' : 'Syncing_Core...'}
