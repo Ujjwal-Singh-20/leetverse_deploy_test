@@ -13,6 +13,49 @@ import Notes from './pages/Notes';
 import ParallaxBackground from './components/ParallaxBackground';
 import { LogIn, LogOut, User as UserIcon, Shield, X } from 'lucide-react';
 
+import { checkHealth } from './services/api';
+
+const SystemStatus = () => {
+  const [isHealthy, setIsHealthy] = React.useState(null);
+  const [checking, setChecking] = React.useState(false);
+
+  const performCheck = async () => {
+    if (checking) return;
+    setChecking(true);
+    const healthy = await checkHealth();
+    setIsHealthy(healthy);
+    setChecking(false);
+  };
+
+  useEffect(() => {
+    performCheck();
+    const interval = setInterval(performCheck, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  if (isHealthy === true) return (
+    <div className="flex items-center gap-2 group cursor-help transition-all duration-500" title="Neural Link Active">
+      <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_#00ff9d]" />
+      <span className="text-[10px] font-mono text-accent/50 group-hover:text-accent transition-colors uppercase tracking-[0.2em] lg:block hidden">System_Live</span>
+    </div>
+  );
+
+  return (
+    <div 
+      onClick={performCheck}
+      className={`flex items-center gap-3 px-3 py-1.5 border rounded-sm transition-all duration-500 cursor-pointer ${
+      isHealthy === false 
+        ? 'border-orange-500/30 bg-orange-500/5 text-orange-400' 
+        : 'border-white/10 text-white/40'
+    }`}>
+      <div className={`w-1.5 h-1.5 rounded-full ${isHealthy === false ? 'bg-orange-500 animate-pulse shadow-[0_0_8px_#f97316]' : 'bg-white/20'}`} />
+      <span className="text-[10px] font-mono uppercase tracking-[0.15em] font-bold">
+        {isHealthy === false ? 'System_Waking_Up...' : 'Syncing_Core...'}
+      </span>
+    </div>
+  );
+};
+
 const Navigation = () => {
   const { user, login, logout, isAdmin } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -40,25 +83,29 @@ const Navigation = () => {
     <>
       <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-6 py-4 flex items-center justify-between ${isScrolled ? 'bg-background/80 backdrop-blur-md border-b border-white/10' : 'bg-transparent'
         }`}>
-        <Link to="/" className="flex items-center gap-2 group relative z-[60]" onClick={handleLinkClick}>
-          <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center border border-accent/30 group-hover:border-accent/50 transition-all overflow-hidden lg:block hidden">
-            <img
-              src="/leetverse logo.jpg"
-              alt="Logo"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="lg:hidden w-8 h-8 bg-accent/20 rounded-md flex items-center justify-center border border-accent/20">
-            <img
-              src="/leetverse logo.jpg"
-              alt="Logo"
-              className="w-full h-full object-cover rounded-md"
-            />
-          </div>
-          <span className="text-xl font-display font-bold tracking-tighter text-white group-hover:text-accent transition-colors">
-            LEET<span className="text-accent underline decoration-accent/30 underline-offset-4">VERSE</span>
-          </span>
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link to="/" className="flex items-center gap-2 group relative z-[60]" onClick={handleLinkClick}>
+            <div className="w-10 h-10 bg-accent/20 rounded-lg flex items-center justify-center border border-accent/30 group-hover:border-accent/50 transition-all overflow-hidden lg:block hidden">
+              <img
+                src="/leetverse logo.jpg"
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="lg:hidden w-8 h-8 bg-accent/20 rounded-md flex items-center justify-center border border-accent/20">
+              <img
+                src="/leetverse logo.jpg"
+                alt="Logo"
+                className="w-full h-full object-cover rounded-md"
+              />
+            </div>
+            <span className="text-xl font-display font-bold tracking-tighter text-white group-hover:text-accent transition-colors">
+              LEET<span className="text-accent underline decoration-accent/30 underline-offset-4">VERSE</span>
+            </span>
+          </Link>
+
+          <SystemStatus />
+        </div>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-8 text-m font-mono uppercase tracking-widest">

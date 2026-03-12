@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Star, RefreshCcw, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { getTop10Leaderboard } from '../services/api';
+import { getTop10Leaderboard, getDirectTop10 } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const Leaderboard = () => {
@@ -11,12 +11,34 @@ const Leaderboard = () => {
 
     const fetchLeaderboard = async () => {
         setLoading(true);
+        let currentData = [];
+
         try {
-            const response = await getTop10Leaderboard(user?.rollNo);
-            setLeaderboardData(response.data);
+            // 🚀 Phase 1: Instant Direct Fetch from Edge Config (First Paint)
+            const directData = await getDirectTop10();
+            if (Array.isArray(directData) && directData.length > 0) {
+                currentData = directData;
+                setLeaderboardData(directData);
+                setLoading(false); // Data is ready to show
+            }
+
+            // ⚡ Phase 2: Augmented Backend Fetch (includes current user rank & ellipsis)
+            try {
+                const response = await getTop10Leaderboard(user?.rollNo);
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                    setLeaderboardData(response.data);
+                }
+            } catch (backendError) {
+                console.warn('Backend augmentation failed, using edge data only', backendError);
+                // If we don't have any data yet from direct fetch, we might need to show []
+                if (currentData.length === 0) {
+                    setLeaderboardData([]);
+                }
+            }
         } catch (error) {
-            console.error('Error fetching leaderboard:', error);
-            setLeaderboardData([]);
+            console.error('Leaderboard refresh failed:', error);
+            // Only clear data if we have literally nothing to show
+            setLeaderboardData(prev => prev.length > 0 ? prev : []);
         } finally {
             setLoading(false);
         }
@@ -24,7 +46,7 @@ const Leaderboard = () => {
 
     useEffect(() => {
         fetchLeaderboard();
-    }, []);
+    }, [user?.rollNo]); // Refetch if user changes
 
     const containerVariants = {
         hidden: { opacity: 0 },
